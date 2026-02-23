@@ -1,0 +1,120 @@
+[
+  {
+    "id": "envista",
+    "label": "enVista Monofocal",
+    "type": "IOL",
+    "manufacturer": "Bausch & Lomb",
+    "model": "enVista",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5],
+    "logMAR": [0.91, 0.81, 0.71, 0.61, 0.51, 0.41, 0.30, 0.18, 0.06, 0.00, 0.03, 0.20, 0.36],
+    "notes": "Neutral aspheric monofocal IOL"
+  },
+  {
+    "id": "zcb00",
+    "label": "TECNIS 1-Piece Monofocal",
+    "type": "IOL",
+    "manufacturer": "Johnson & Johnson Vision",
+    "model": "TECNIS Monofocal ZCB00",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0],
+    "logMAR": [1.20, 1.00, 0.80, 0.70, 0.62, 0.48, 0.36, 0.23, 0.15, 0.08, 0.02, 0.00, 0.00, 0.05, 0.15, 0.23, 0.40, 0.55],
+    "notes": "Standard aspheric monofocal IOL optimized for crisp distance vision."
+  },
+  {
+    "id": "icb00",
+    "label": "Eyhance Enhanced Monofocal",
+    "type": "IOL",
+    "manufacturer": "Johnson & Johnson Vision",
+    "model": "TECNIS Eyhance ICB00",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0],
+    "logMAR": [0.99, 0.85, 0.70, 0.65, 0.54, 0.40, 0.25, 0.12, 0.08, 0.00, 0.00, 0.00, 0.00, 0.05, 0.13, 0.22, 0.40, 0.55],
+    "notes": "Enhanced monofocal IOL with modest depth of focus extension."
+  },
+  {
+    "id": "zxr00",
+    "label": "TECNIS Symfony EDOF",
+    "type": "IOL",
+    "manufacturer": "Johnson & Johnson Vision",
+    "model": "TECNIS Symfony zxr00",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.91, 0.82, 0.62, 0.51, 0.33, 0.13, 0.08, 0.06, 0.06, 0.01, 0.06, 0.17, 0.37, 0.59],
+    "notes": "Extended depth of focus IOL providing improved intermediate vision"
+  },
+  {
+    "id": "zen00v",
+    "label": "PureSee EDOF",
+    "type": "IOL",
+    "manufacturer": "Johnson & Johnson Vision",
+    "model": "TECNIS PureSee ZEN00V",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0],
+    "logMAR": [0.80, 0.70, 0.60, 0.52, 0.44, 0.28, 0.18, 0.15, 0.11, 0.05, 0.00, 0.00, 0.00, 0.05, 0.10, 0.19, 0.36, 0.48],
+    "notes": "Refractive EDOF IOL designed to provide a continuous range of vision."
+  },
+  {
+    "id": "zrf00v",
+    "label": "TECNIS Synergy EDOF",
+    "type": "IOL",
+    "manufacturer": "Johnson & Johnson Vision",
+    "model": "TECNIS Synergy zrf00v",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.48, 0.26, 0.18, 0.03, 0.00, 0.00, 0.00, 0.02, 0.01, 0.00, 0.01, 0.25, 0.42, 0.49],
+    "notes": "Combined EDOF and multifocal technologies"
+  },
+  {
+    "id": "miniwell",
+    "label": "Mini WELL EDOF",
+    "type": "IOL",
+    "manufacturer": "SIFI",
+    "model": "Mini WELL Ready",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.88, 0.81, 0.70, 0.59, 0.45, 0.32, 0.26, 0.14, 0.05, 0.00, 0.12, 0.30, 0.46, 0.61],
+    "notes": "Non-diffractive EDOF"
+  },
+  {
+    "id": "vivity",
+    "label": "AcrySof IQ Vivity EDOF",
+    "type": "IOL",
+    "manufacturer": "Alcon",
+    "model": "AcrySof IQ Vivity",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5],
+    "logMAR": [0.89, 0.75, 0.61, 0.47, 0.33, 0.19, 0.10, 0.07, 0.01, 0.00, 0.08, 0.26, 0.41],
+    "notes": "Non-diffractive EDOF"
+  },
+  {
+    "id": "839MP",
+    "label": "AT LISA Tri Trifocal",
+    "type": "IOL",
+    "manufacturer": "Carl Zeiss Meditec",
+    "model": "AT LISA tri 839MP",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.74, 0.53, 0.41, 0.25, 0.15, 0.15, 0.15, 0.12, 0.08, 0.04, 0.09, 0.22, 0.42, 0.55],
+    "notes": "Diffractive trifocal IOL"
+  },
+  {
+    "id": "finevision",
+    "label": "FineVision Trifocal",
+    "type": "IOL",
+    "manufacturer": "PhysIOL",
+    "model": "FineVision Micro F",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.70, 0.61, 0.38, 0.22, 0.20, 0.25, 0.32, 0.24, 0.09, 0.02, 0.12, 0.30, 0.45, 0.61],
+    "notes": "Diffractive trifocal IOL"
+  },
+  {
+    "id": "panoptix",
+    "label": "PanOptix Trifocal",
+    "type": "IOL",
+    "manufacturer": "Alcon",
+    "model": "AcrySof IQ PanOptix",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [0.45, 0.26, 0.13, 0.03, 0.00, 0.00, 0.01, 0.05, 0.00, 0.00, 0.00, 0.16, 0.37, 0.54],
+    "notes": "Diffractive trifocal IOL"
+  },
+  {
+    "id": "phakic_young_model",
+    "label": "Phakic (Young Adult) - model",
+    "type": "phakic",
+    "defocus_D": [-4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
+    "logMAR": [1.33, 1.23, 1.12, 1.00, 0.86, 0.70, 0.51, 0.30, 0.10, 0.00, 0.10, 0.30, 0.51, 0.70],
+    "notes": "Computed with VA_rel = 1/(1+defocus^2) and logMAR = log10(1+defocus^2); base 20/20 at 0D."
+  }
+]
