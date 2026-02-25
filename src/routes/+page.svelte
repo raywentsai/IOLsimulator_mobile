@@ -12,6 +12,7 @@
     iolCurves,
     masterDefocus,
     targetRefraction,
+    compareTargetRefraction,
     accommodationCapacity,
     nsGrade,
     pscRadius,
@@ -126,12 +127,18 @@
     presbyopiaCompareProfile.set('normal');
   }
   $: iolOptions = $iolCurves.map((lens) => ({ value: lens.id, label: lens.label }));
-  $: targetRefractionLabel = `${$targetRefraction >= 0 ? '+' : ''}${$targetRefraction.toFixed(2)} D`;
+  $: targetRefractionLabel = formatTargetRefractionLabel($targetRefraction);
+  $: targetRefractionLeftLabel = formatTargetRefractionLabel($targetRefraction);
+  $: targetRefractionRightLabel = formatTargetRefractionLabel($compareTargetRefraction);
   $: panelTitle = activePanel === 'landing'
     ? LANDING_SHEET_TITLE
     : activePanel === 'settings'
       ? 'Settings'
       : 'Calibrate';
+
+  function formatTargetRefractionLabel(value: number): string {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(2)} D`;
+  }
 
   function setMode(mode: SimulationMode): void {
     if ($simulationMode === mode) {
@@ -143,6 +150,7 @@
     if (mode === 'Presbyopia') {
       patientAge = PRESBYOPIA_DEFAULT_AGE;
       targetRefraction.set(0);
+      compareTargetRefraction.set(0);
       applyPresbyopiaProfile('presbyopia');
       presbyopiaCompareProfile.set('normal');
       accommodationCapacity.set(PRESBYOPIA_DEFAULT_ACCOMMODATION_D);
@@ -185,14 +193,31 @@
     accommodationCapacity.set(value);
   }
 
-  function onTargetRefractionInput(event: Event): void {
+  function getTargetRefractionFromInput(event: Event): number | null {
     const rawValue = Number((event.target as HTMLInputElement).value);
     if (!Number.isFinite(rawValue)) {
+      return null;
+    }
+
+    return Math.min(TARGET_REFRACTION_MAX_D, Math.max(TARGET_REFRACTION_MIN_D, rawValue));
+  }
+
+  function onTargetRefractionInput(event: Event): void {
+    const clampedValue = getTargetRefractionFromInput(event);
+    if (clampedValue === null) {
       return;
     }
 
-    const clampedValue = Math.min(TARGET_REFRACTION_MAX_D, Math.max(TARGET_REFRACTION_MIN_D, rawValue));
     targetRefraction.set(clampedValue);
+  }
+
+  function onCompareTargetRefractionInput(event: Event): void {
+    const clampedValue = getTargetRefractionFromInput(event);
+    if (clampedValue === null) {
+      return;
+    }
+
+    compareTargetRefraction.set(clampedValue);
   }
 
   function handlePrimaryLensChange(event: CustomEvent<{ value: string }>): void {
@@ -467,22 +492,57 @@
             {#if $simulationMode === 'IOL'}
               <div class="settings-section">
                 <h3 class="section-title">Vision</h3>
-                <div class="control-block">
-                  <div class="control-header">
-                    <label for="target-refraction">Target Refraction</label>
-                    <span class="control-value">{targetRefractionLabel}</span>
+                {#if $splitViewEnabled}
+                  <div class="control-block">
+                    <div class="control-header">
+                      <label for="target-refraction-left">Target refraction (left)</label>
+                      <span class="control-value">{targetRefractionLeftLabel}</span>
+                    </div>
+                    <input
+                      id="target-refraction-left"
+                      class="range-input"
+                      type="range"
+                      min={TARGET_REFRACTION_MIN_D}
+                      max={TARGET_REFRACTION_MAX_D}
+                      step="0.25"
+                      value={$targetRefraction}
+                      on:input={onTargetRefractionInput}
+                    />
                   </div>
-                  <input
-                    id="target-refraction"
-                    class="range-input"
-                    type="range"
-                    min={TARGET_REFRACTION_MIN_D}
-                    max={TARGET_REFRACTION_MAX_D}
-                    step="0.25"
-                    value={$targetRefraction}
-                    on:input={onTargetRefractionInput}
-                  />
-                </div>
+                  <div class="control-block">
+                    <div class="control-header">
+                      <label for="target-refraction-right">Target refraction (right)</label>
+                      <span class="control-value">{targetRefractionRightLabel}</span>
+                    </div>
+                    <input
+                      id="target-refraction-right"
+                      class="range-input"
+                      type="range"
+                      min={TARGET_REFRACTION_MIN_D}
+                      max={TARGET_REFRACTION_MAX_D}
+                      step="0.25"
+                      value={$compareTargetRefraction}
+                      on:input={onCompareTargetRefractionInput}
+                    />
+                  </div>
+                {:else}
+                  <div class="control-block">
+                    <div class="control-header">
+                      <label for="target-refraction">Target Refraction</label>
+                      <span class="control-value">{targetRefractionLabel}</span>
+                    </div>
+                    <input
+                      id="target-refraction"
+                      class="range-input"
+                      type="range"
+                      min={TARGET_REFRACTION_MIN_D}
+                      max={TARGET_REFRACTION_MAX_D}
+                      step="0.25"
+                      value={$targetRefraction}
+                      on:input={onTargetRefractionInput}
+                    />
+                  </div>
+                {/if}
               </div>
             {:else}
               <div class="settings-section">

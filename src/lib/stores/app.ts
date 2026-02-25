@@ -74,6 +74,7 @@ export const masterDefocus = writable(DEFAULT_MASTER_DEFOCUS_D);
 export const selectedLensId = writable('zcb00');
 export const selectedCompareLensId = writable('zxr00');
 export const targetRefraction = writable(0.0);
+export const compareTargetRefraction = writable(0.0);
 
 // ========== Presbyopia Mode Parameters ==========
 export const presbyopiaProfile = writable<PresbyopiaProfile>('presbyopia');
@@ -250,18 +251,18 @@ export const activeCompareCurve: Readable<LensCurve | undefined> = derived(
 export const compareDefocus: Readable<number> = derived(
   [
     simulationMode,
-    currentDefocus,
     masterDefocus,
+    compareTargetRefraction,
     presbyopiaCompareProfile
   ],
   ([
     $simulationMode,
-    $currentDefocus,
     $masterDefocus,
+    $compareTargetRefraction,
     $presbyopiaCompareProfile
   ]) => {
     if ($simulationMode === 'IOL') {
-      return $currentDefocus;
+      return getIOLDefocus($masterDefocus, $compareTargetRefraction);
     }
 
     const preset = getPresbyopiaProfilePreset($presbyopiaCompareProfile);
@@ -305,7 +306,7 @@ export const compareBlurSigma: Readable<number> = derived(
   )
 );
 
-// Background blur uses target refraction as far-distance defocus.
+// Background blur uses per-side target refraction as far-distance defocus.
 export const backgroundLogMAR: Readable<number> = derived(
   [simulationMode, activePrimaryCurve, targetRefraction],
   ([$mode, $curve, $targetRefraction]) =>
@@ -313,7 +314,7 @@ export const backgroundLogMAR: Readable<number> = derived(
 );
 
 export const compareBackgroundLogMAR: Readable<number> = derived(
-  [simulationMode, activeCompareCurve, targetRefraction],
+  [simulationMode, activeCompareCurve, compareTargetRefraction],
   ([$mode, $curve, $targetRefraction]) =>
     $mode === 'IOL' ? resolveCurveLogMAR($curve, $targetRefraction) : 0
 );
