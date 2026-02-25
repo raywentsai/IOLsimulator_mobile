@@ -92,7 +92,7 @@
   const ZOOM_BANNER_DURATION_MS = 2400;
   const BOOK_TEXTURE_UPDATE_INTERVAL_MS = 66; // ~15 Hz max while dragging
   const BOOK_TEXTURE_SIZE_QUANTIZATION_PX = 8;
-  const UNIVERSAL_DPR_CAP = 2;
+  const UNIVERSAL_DPR_CAP = 3; // suitable for most smartphone displays
   const BOOK_TEXTURE_SAFE_FLOOR = 512;
   const BOOK_TEXTURE_HARD_CAP = 1536;
   const RESIZE_DEBOUNCE_MS = 200;
@@ -119,17 +119,20 @@
 
   function getHoldingDistanceBadge(distanceMeters: number): string {
     if (!Number.isFinite(distanceMeters)) {
-      return "Far";
+      return "Intermediate";
     }
 
     const distanceCm = distanceMeters * 100;
-    if (distanceCm < 35) {
+    if (distanceCm < 30) {
       return "Near";
     }
-    if (distanceCm <= 75) {
+    if (distanceCm <= 45) {
       return "Reading";
     }
-    return "Far";
+    if (distanceCm <= 75) {
+      return "Computer";
+    }
+    return "Intermediate";
   }
 
   function ensureIOLMonoLoaded(): Promise<void> {
@@ -367,19 +370,21 @@
   // Foreground text content rendered as explicit left/right columns.
   const BOOK_OVERLAY_TEXT_COLUMNS = {
     left: [
-      "Book text",
+      "BOOK text",
       "책 글자 크기",
       "書本字體",
+      "I love KCIS!",
       "",
-      "KCIS 2026",
-      "is fun!",
+      "천 교수님은 정말 아름다우십니다. 아시는 분은 전해 주세요.",
     ],
     right: [
       "Book text",
       "책 글자 크기",
       "書本字體",
       "",
-      "천 교수님은 정말 아름답습니다."
+      "How to call a Fish with no eyes?",
+      "",
+      "fsh 👁️_👁️",
     ]
   } as const;
 
@@ -387,7 +392,7 @@
   const BOOK_OVERLAY_TEXT_STYLE = {
     fontFamily: IOL_MONO_STACK,
     fontWeight: 500,
-    fontSizeRatio: 0.070,     // font px = ratio * displayedBookWidthPx
+    fontSizeRatio: 0.055,     // font px = ratio * displayedBookWidthPx
     lineHeightRatio: 0.028,   // line height px = ratio * displayedBookWidthPx
     columnWidthRatio: 0.49,   // each text column width as ratio of displayed book width
     leftColumnXRatio: 0.03,   // left page anchor

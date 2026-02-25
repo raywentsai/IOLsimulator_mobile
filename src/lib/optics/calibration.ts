@@ -14,7 +14,7 @@ export const CREDIT_CARD_SHORT_EDGE_MM = 53.98;
 export const DEFAULT_PHONE_VIEWING_DISTANCE_M = 0.4;
 export const MIN_VIEWING_DISTANCE_M = 0.2;
 export const MAX_VIEWING_DISTANCE_M = 1.0;
-export const DEFAULT_CALIBRATION_PPI = 110;
+export const DEFAULT_CALIBRATION_PPI = 170; // match original research setup
 export const DEFAULT_CSS_PX_PER_MM = DEFAULT_CALIBRATION_PPI / 25.4;
 export const DEFAULT_CALIBRATION_SCALE = 1;
 
@@ -23,7 +23,6 @@ export const DEFAULT_CALIBRATION_SCALE = 1;
  */
 export const DEFAULT_BOOK_BASELINE_WIDTH_M = 0.07;
 export const DEFAULT_BOOK_REFERENCE_VIEWING_DISTANCE_M = DEFAULT_PHONE_VIEWING_DISTANCE_M;
-// z0: reference hold distance for magnification normalization.
 export const DEFAULT_BOOK_REFERENCE_HOLD_DISTANCE_M = 0.4;
 
 /**

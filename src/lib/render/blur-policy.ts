@@ -1,16 +1,14 @@
 /**
  * Centralized blur sigma policy.
- *
- * Phase 2 policy:
- * - Preserve full-grid sigma strength (no sigma weakening).
- * - Select computational path by workload: full-res, 2x/4x/8x/16x downsample.
+ * Select computational path by workload: full-res, 2x/4x/8x/16x downsample.
  */
 
 export type BlurPath = 'full-res' | 'downsample-2x' | 'downsample-4x' | 'downsample-8x' | 'downsample-16x';
 export const BACKGROUND_BLUR_DOWNSAMPLE_FACTOR: 1 = 1;
-// Reference CSS px/mm used by the original Leung-tuned sigma mapping environment (~110 PPI).
-export const DEFAULT_BLUR_REFERENCE_CSS_PX_PER_MM = 110 / 25.4;
-export const DEFAULT_BLUR_REFERENCE_VIEWING_DISTANCE_M = 0.4;
+// Reference CSS px/mm used by the original Leung-tuned sigma mapping environment (~170 PPI).
+export const DEFAULT_BLUR_REFERENCE_CSS_PX_PER_MM = 170 / 25.4;
+// Reference display distance by the original Leung's work (1 meter).
+export const DEFAULT_BLUR_REFERENCE_VIEWING_DISTANCE_M = 1.0;
 
 export interface BlurPolicyInput {
   // Raw sigma from optics mapping in reference pixel units.
@@ -100,9 +98,13 @@ export function resolveBlurPolicy(input: BlurPolicyInput): BlurPolicyOutput {
     viewingDistanceNormalizationScale;
   const sigmaTexelRawFull = sigmaCssNormalized * renderPixelScale * blurRenderScale;
 
+  // Comment out workload scaling temporarily
   // Workload scaling encourages earlier downsampling for large foreground area/high DPR.
   let workloadScore = sigmaTexelRawFull;
-  if (clampedCoverage >= 0.45) {
+  let downsampleFactor: 1 | 2 | 4 | 8 | 16 = 1;
+  let path: BlurPath = 'full-res';
+
+/*   if (clampedCoverage >= 0.45) {
     workloadScore *= 1.45;
   } else if (clampedCoverage >= 0.30) {
     workloadScore *= 1.30;
@@ -116,9 +118,6 @@ export function resolveBlurPolicy(input: BlurPolicyInput): BlurPolicyOutput {
     workloadScore *= 1.10;
   }
 
-  let downsampleFactor: 1 | 2 | 4 | 8 | 16 = 1;
-  let path: BlurPath = 'full-res';
-
   if (workloadScore > 48) {
     downsampleFactor = 16;
     path = 'downsample-16x';
@@ -131,7 +130,7 @@ export function resolveBlurPolicy(input: BlurPolicyInput): BlurPolicyOutput {
   } else if (workloadScore > 6) {
     downsampleFactor = 2;
     path = 'downsample-2x';
-  }
+  } */
 
   return {
     sigmaCssRaw,

@@ -14,9 +14,11 @@ export interface GaussianKernel {
   sigma: number;
 }
 
-function generateLinearSamplingKernel(sigma: number, maxPairs: number = 15): GaussianKernel {
-  const clampedSigma = Math.max(0.1, Math.min(10.0, sigma));
-  const radius = Math.min(Math.ceil(3 * clampedSigma), maxPairs * 2);
+function generateLinearSamplingKernel(sigma: number, maxPairs: number = 30): GaussianKernel {
+  const clampedSigma = Math.min(30, sigma);
+  // clamp large sigmas for performance
+  const radius = Math.min(Math.ceil(4 * clampedSigma), maxPairs * 2);
+  // radius = 4 to match SciPy’s default from the original Leung's work
   const gaussian = (x: number) => Math.exp(-0.5 * (x * x) / (clampedSigma * clampedSigma));
 
   const fullWeights: number[] = [];

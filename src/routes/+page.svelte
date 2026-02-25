@@ -48,6 +48,8 @@
   const ALLOWED_PRESBYOPIA_PROFILES: PresbyopiaProfile[] = ['presbyopia', 'normal'];
   const PRESBYOPIA_DEFAULT_AGE = 60;
   const PRESBYOPIA_DEFAULT_ACCOMMODATION_D = 0.5;
+  const TARGET_REFRACTION_MIN_D = -3.0;
+  const TARGET_REFRACTION_MAX_D = 0.5;
   const CARD_MATCH_MIN_PPI = 50;
   const CARD_MATCH_MAX_PX = 420;
   const CARD_MATCH_MIN_PX = Math.ceil(
@@ -57,8 +59,8 @@
   );
   const LANDING_SHEET_TITLE = 'IOL Vision Simulator';
   const LANDING_DISCLAIMER_LINES = [
-    'Demo only. Not for diagnosis or treatment.',
-    'VA, blur, and cataract effects are approximate and may vary.'
+    'Demo only. Visual acuity, blur, and cataract effects are illustrative.',
+    'No claims regarding product performance, comparative efficacy, or individual outcomes.'
   ] as const;
   const LANDING_BEFORE_START_ITEMS = [
     'Calibrate display with a credit card.',
@@ -67,8 +69,8 @@
   ] as const;
   const LANDING_USAGE_ITEMS = [
     {
-      title: 'Set Defocus',
-      detail: 'Use the slider to simulate near ↔ far.'
+      title: 'Set Defocus with Slider',
+      detail: 'See near 📖 & far 🌳.'
     },
     {
       title: 'Compare Lenses',
@@ -181,6 +183,16 @@
   function updateAccommodation(event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
     accommodationCapacity.set(value);
+  }
+
+  function onTargetRefractionInput(event: Event): void {
+    const rawValue = Number((event.target as HTMLInputElement).value);
+    if (!Number.isFinite(rawValue)) {
+      return;
+    }
+
+    const clampedValue = Math.min(TARGET_REFRACTION_MAX_D, Math.max(TARGET_REFRACTION_MIN_D, rawValue));
+    targetRefraction.set(clampedValue);
   }
 
   function handlePrimaryLensChange(event: CustomEvent<{ value: string }>): void {
@@ -464,10 +476,11 @@
                     id="target-refraction"
                     class="range-input"
                     type="range"
-                    min="-1.5"
-                    max="0.5"
+                    min={TARGET_REFRACTION_MIN_D}
+                    max={TARGET_REFRACTION_MAX_D}
                     step="0.25"
-                    bind:value={$targetRefraction}
+                    value={$targetRefraction}
+                    on:input={onTargetRefractionInput}
                   />
                 </div>
               </div>
