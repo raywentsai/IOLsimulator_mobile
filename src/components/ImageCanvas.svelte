@@ -382,9 +382,9 @@
       "책 글자 크기",
       "書本字體",
       "",
-      "How to call a Fish with no eyes?",
+      "Defocus curves show how ",
+      "vision changes with focus.",
       "",
-      "fsh 👁️_👁️",
     ]
   } as const;
 
