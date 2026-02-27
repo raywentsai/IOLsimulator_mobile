@@ -96,6 +96,7 @@
   const BOOK_TEXTURE_SAFE_FLOOR = 512;
   const BOOK_TEXTURE_HARD_CAP = 1536;
   const RESIZE_DEBOUNCE_MS = 200;
+  const IMAGE_LOAD_TIMEOUT_MS = 30000;
   let zoomBannerVisible = false;
   let zoomBannerTimer: ReturnType<typeof setTimeout> | null = null;
   let bookTextureUpdateTimer: ReturnType<typeof setTimeout> | null = null;
@@ -106,6 +107,7 @@
   let bookTextureUpdateRaf: number | null = null;
   let bookTextureUpdateRafForce = false;
   let didBookTexturePrewarm = false;
+  let sceneLoadRequestVersion = 0;
   let iolMonoLoadPromise: Promise<void> | null = null;
 
   function formatVABadge(decimalValue: number): string {
@@ -373,7 +375,6 @@
       "BOOK text",
       "책 글자 크기",
       "書本字體",
-      "I love KCIS!",
       "",
       "천 교수님은 정말 아름다우십니다. 아시는 분은 전해 주세요.",
     ],
@@ -384,7 +385,7 @@
       "",
       "Defocus curves show how ",
       "vision changes with focus.",
-      "",
+      "KCIS is fun!",
     ]
   } as const;
 
@@ -999,7 +1000,7 @@
     await new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error(timeoutMessage));
-      }, 8000);
+      }, IMAGE_LOAD_TIMEOUT_MS);
 
       image.onload = () => {
         clearTimeout(timeout);
@@ -1013,80 +1014,100 @@
     });
   }
 
-  async function loadSceneImage(mode: DisplayImageMode): Promise<void> {
-    if (!isMounted) {
-      return;
+  function isCurrentSceneLoad(requestVersion: number, mode: DisplayImageMode): boolean {
+    return isMounted && requestVersion === sceneLoadRequestVersion && $displayImageMode === mode;
+  }
+
+  async function applyLettersScene(mode: DisplayImageMode, lettersImage: HTMLImageElement): Promise<void> {
+    fallbackImage = lettersImage;
+    fallbackBackgroundImage = null;
+    bookBaseImage = null;
+    loadedDisplayMode = mode;
+
+    foregroundImageWidth = lettersImage.width;
+    foregroundImageHeight = lettersImage.height;
+    foregroundTextureWidth = lettersImage.width;
+    foregroundTextureHeight = lettersImage.height;
+    backgroundImageWidth = lettersImage.width;
+    backgroundImageHeight = lettersImage.height;
+
+    await applyImageDimensions(lettersImage.width, lettersImage.height);
+
+    if (renderer) {
+      const newTextureId = await renderer.loadImageTexture(lettersImage);
+      swapRendererTexture(newTextureId);
+      swapBackgroundTexture(null);
+    } else if (fallbackMode && canvas2dContext) {
+      drawFallbackScene();
     }
 
-    await ensureIOLMonoLoaded();
+    requestRender();
+  }
 
-    try {
-      if (mode === "book") {
+  async function applyBookScene(loadedBookBaseImage: HTMLImageElement, backgroundImage: HTMLImageElement): Promise<void> {
+    bookBaseImage = loadedBookBaseImage;
+    fallbackImage = loadedBookBaseImage;
+    fallbackBackgroundImage = backgroundImage;
+    loadedDisplayMode = "book";
+
+    foregroundImageWidth = loadedBookBaseImage.width;
+    foregroundImageHeight = loadedBookBaseImage.height;
+    foregroundTextureWidth = loadedBookBaseImage.width;
+    foregroundTextureHeight = loadedBookBaseImage.height;
+    backgroundImageWidth = backgroundImage.width;
+    backgroundImageHeight = backgroundImage.height;
+
+    await applyImageDimensions(backgroundImage.width, backgroundImage.height);
+
+    if (renderer) {
+      const bgTextureId = await renderer.loadImageTexture(backgroundImage);
+      swapBackgroundTexture(bgTextureId);
+      requestBookTextureUpdate(true);
+    } else if (fallbackMode && canvas2dContext) {
+      requestBookTextureUpdate(true);
+      drawFallbackScene();
+    }
+
+    requestRender();
+  }
+
+  function startBookSceneUpgrade(requestVersion: number): void {
+    void (async () => {
+      try {
         const [loadedBookBaseImage, backgroundImage] = await Promise.all([
           createBookImageElement(),
           createBackgroundImageElement()
         ]);
 
-        if (!isMounted) {
+        if (!isCurrentSceneLoad(requestVersion, "book")) {
           return;
         }
 
-        bookBaseImage = loadedBookBaseImage;
-        fallbackImage = loadedBookBaseImage;
-        fallbackBackgroundImage = backgroundImage;
-        loadedDisplayMode = mode;
-
-        foregroundImageWidth = loadedBookBaseImage.width;
-        foregroundImageHeight = loadedBookBaseImage.height;
-        foregroundTextureWidth = loadedBookBaseImage.width;
-        foregroundTextureHeight = loadedBookBaseImage.height;
-        backgroundImageWidth = backgroundImage.width;
-        backgroundImageHeight = backgroundImage.height;
-
-        await applyImageDimensions(backgroundImage.width, backgroundImage.height);
-
-        if (renderer) {
-          const bgTextureId = await renderer.loadImageTexture(backgroundImage);
-          swapBackgroundTexture(bgTextureId);
-          requestBookTextureUpdate(true);
-        } else if (fallbackMode && canvas2dContext) {
-          requestBookTextureUpdate(true);
-          drawFallbackScene();
-        }
-        requestRender();
-        return;
+        await applyBookScene(loadedBookBaseImage, backgroundImage);
+      } catch {
+        // Keep the simulator usable with the text-only scene if book assets time out or fail.
       }
+    })();
+  }
 
+  async function loadSceneImage(mode: DisplayImageMode): Promise<void> {
+    if (!isMounted) return;
+
+    await ensureIOLMonoLoaded();
+    const requestVersion = ++sceneLoadRequestVersion;
+
+    try {
       const lettersImage = await createLettersImageElement();
+      if (!isCurrentSceneLoad(requestVersion, mode)) return;
+      await applyLettersScene(mode, lettersImage);
+      if (!isCurrentSceneLoad(requestVersion, mode)) return;
 
-      if (!isMounted) {
+      if (mode === "book") {
+        startBookSceneUpgrade(requestVersion);
         return;
       }
-
-      fallbackImage = lettersImage;
-      fallbackBackgroundImage = null;
-      bookBaseImage = null;
-      loadedDisplayMode = mode;
-
-      foregroundImageWidth = lettersImage.width;
-      foregroundImageHeight = lettersImage.height;
-      foregroundTextureWidth = lettersImage.width;
-      foregroundTextureHeight = lettersImage.height;
-      backgroundImageWidth = lettersImage.width;
-      backgroundImageHeight = lettersImage.height;
-
-      await applyImageDimensions(lettersImage.width, lettersImage.height);
-
-      if (renderer) {
-        const newTextureId = await renderer.loadImageTexture(lettersImage);
-        swapRendererTexture(newTextureId);
-        swapBackgroundTexture(null);
-      } else if (fallbackMode && canvas2dContext) {
-        drawFallbackScene();
-      }
-      requestRender();
     } catch (error) {
-      if (isMounted) {
+      if (isCurrentSceneLoad(requestVersion, mode)) {
         errorMessage = `Failed to load image: ${error}`;
         loadingMessage = "";
       }
