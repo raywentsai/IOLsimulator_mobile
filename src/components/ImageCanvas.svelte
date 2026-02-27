@@ -884,7 +884,7 @@
       await new Promise(resolve => setTimeout(resolve, 100));
 
       updateLoadingProgress("Loading image...", 4);
-      await loadSceneImage($displayImageMode);
+      await loadSceneImage($displayImageMode, { initialLoad: true });
 
       updateLoadingProgress("Starting render loop...", 5);
       isInitialized = true;
@@ -1090,22 +1090,58 @@
     })();
   }
 
-  async function loadSceneImage(mode: DisplayImageMode): Promise<void> {
+  async function loadLettersSceneIfCurrent(requestVersion: number, mode: DisplayImageMode): Promise<boolean> {
+    const lettersImage = await createLettersImageElement();
+    if (!isCurrentSceneLoad(requestVersion, mode)) {
+      return false;
+    }
+    await applyLettersScene(mode, lettersImage);
+    return isCurrentSceneLoad(requestVersion, mode);
+  }
+
+  async function loadSceneImage(
+    mode: DisplayImageMode,
+    options: { initialLoad?: boolean } = {}
+  ): Promise<void> {
     if (!isMounted) return;
 
     await ensureIOLMonoLoaded();
     const requestVersion = ++sceneLoadRequestVersion;
+    const initialLoad = options.initialLoad === true;
 
     try {
-      const lettersImage = await createLettersImageElement();
-      if (!isCurrentSceneLoad(requestVersion, mode)) return;
-      await applyLettersScene(mode, lettersImage);
-      if (!isCurrentSceneLoad(requestVersion, mode)) return;
-
       if (mode === "book") {
+        if (initialLoad) {
+          try {
+            const [loadedBookBaseImage, backgroundImage] = await Promise.all([
+              createBookImageElement(),
+              createBackgroundImageElement()
+            ]);
+
+            if (!isCurrentSceneLoad(requestVersion, mode)) {
+              return;
+            }
+
+            await applyBookScene(loadedBookBaseImage, backgroundImage);
+            return;
+          } catch {
+            const didApplyLetters = await loadLettersSceneIfCurrent(requestVersion, mode);
+            if (didApplyLetters) {
+              return;
+            }
+            return;
+          }
+        }
+
+        const didApplyLetters = await loadLettersSceneIfCurrent(requestVersion, mode);
+        if (!didApplyLetters) {
+          return;
+        }
         startBookSceneUpgrade(requestVersion);
         return;
       }
+
+      await loadLettersSceneIfCurrent(requestVersion, mode);
     } catch (error) {
       if (isCurrentSceneLoad(requestVersion, mode)) {
         errorMessage = `Failed to load image: ${error}`;
@@ -1413,7 +1449,7 @@
       }
       
       updateLoadingProgress("Loading image...", 4);
-      await loadSceneImage($displayImageMode);
+      await loadSceneImage($displayImageMode, { initialLoad: true });
       
       updateLoadingProgress("Starting render loop...", 5);
       isInitialized = true;
