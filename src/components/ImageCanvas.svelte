@@ -372,11 +372,11 @@
   // Foreground text content rendered as explicit left/right columns.
   const BOOK_OVERLAY_TEXT_COLUMNS = {
     left: [
-      "BOOK text",
+      "Book text",
       "책 글자 크기",
       "書本字體",
       "",
-      "천 교수님은 정말 아름다우십니다. 아시는 분은 전해 주세요.",
+      "Can you read this line?",
     ],
     right: [
       "Book text",
@@ -385,7 +385,7 @@
       "",
       "Defocus curves show how ",
       "vision changes with focus.",
-      "KCIS is fun!",
+      "Nice to see U!",
     ]
   } as const;
 
